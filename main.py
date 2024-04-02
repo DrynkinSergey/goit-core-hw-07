@@ -36,7 +36,16 @@ def main():
             case "find" | "get":
                 exist = book.find_record(name)
                 print(exist)
-
+            case "show_birthday":
+                if len(args) < 1:
+                    print(f'Please enter, correct args. Example: "show_birthday Oleh"')
+                    continue
+                exist_record = book.find_record(name)
+                if exist_record:
+                    exist_record.show_birthday()
+                else:
+                    print("User is not exist")
+                    continue
             case "add_birthday":
                 if len(args) < 2:
                     print(

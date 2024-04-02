@@ -56,6 +56,9 @@ class Birthday(Field):
             return True
         except ValueError:
             return False
+    
+    def __repr__(self):
+        return f'{self.value.strftime("%d.%m.%Y")}'
 
 
 class Name(Field): ...
@@ -81,9 +84,14 @@ class Record:
         self.birthday = None
 
     def add_birthday(self, value):
-        print(value)
         self.birthday = Birthday(value)
-
+        
+    def show_birthday(self):
+        if not self.birthday:
+            return print(f'Error')
+        return print(f'{self.name.value} have birthday: {self.birthday.value.strftime("%d.%m.%Y")}')
+    
+    
     @staticmethod
     def phone_is_exist(data, phone):
         for p in data:
@@ -106,7 +114,9 @@ class Record:
         self.phones.append(Phone(phone))
 
     def __str__(self):
-        return f"Contact name: {self.name.value} \nPhones: {'; '.join(p.value for p in self.phones)}\nBirthday: {self.birthday.value.strftime("%d.%m.%Y")}\n"
+        if self.birthday:
+            return f"Contact name: {self.name.value} \nPhones: {'; '.join(p.value for p in self.phones)}\nBirthday: {self.birthday.value.strftime("%d.%m.%Y")}\n"
+        return f"Contact name: {self.name.value} \nPhones: {'; '.join(p.value for p in self.phones)}\nBirthday: {self.birthday}\n"
 
 
 class AddressBook(UserDict):
