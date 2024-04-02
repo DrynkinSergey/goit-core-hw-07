@@ -45,9 +45,10 @@ def get_upcoming_birthdays(users_list: list) -> list:
     """
     today = datetime.today()
     normalized_users = normalize_users_date(users_list)
-    delta_today_period = today.date() + timedelta(days=7)
+    delta_max_period = today.date() + timedelta(days=7)
+    delta_min_period = today.date() - timedelta(days=7)
     return[{"name": user['name'], "congratulation_date": modified_users_date(user['birthday']).strftime("%d.%m.%Y")}
-           for user in normalized_users if user['birthday'] <= delta_today_period]
+           for user in normalized_users if delta_min_period <= user['birthday'] <= delta_max_period]
 
 
 
