@@ -1,5 +1,56 @@
 from collections import UserDict
-from datetime import datetime
+from datetime import datetime,timedelta
+
+def errors_handler(func):
+    def wrapper(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+       
+        except ValueError:
+            print(
+                f"Parameters is not correct... Invalid date format. Use DD.MM.YYYY ")
+    return wrapper
+
+
+def normalize_users_date(users_list, today=datetime.today()):
+    """
+    Функция нормализирует даты для корректной работы с разными годами рождения.
+
+    :param users_list: Список пользователей
+    :param today: Текущий день
+    :return: Возвращается год пользователя приравнивая к текущему
+    """
+    return [{"name": user.name, "birthday": user.birthday.value.date()
+    .replace(year=today.year)} for user in users_list if user.birthday]
+
+
+def modified_users_date(date):
+    """
+    Функция хелпер для перевода поздравления на понедельник. Если день выпал на выходной
+    :param date: День рождения пользователя
+    :return: День поздравления
+    """
+    if date.weekday() in {5, 6}:
+        return date + timedelta(days=7 - date.weekday())
+    return date
+
+
+def get_upcoming_birthdays(users_list: list) -> list:
+    """
+    Функция определяет список людей для поздравлений.
+    Если день рождения выпадает на выходной - переносит на первый рабочий (пн)
+
+    :param users_list: Массив пользователей
+    :return: Массив пользователей для поздравлений в след 7 дней
+    """
+    today = datetime.today()
+    normalized_users = normalize_users_date(users_list)
+    delta_today_period = today.date() + timedelta(days=7)
+    return[{"name": user['name'], "congratulation_date": modified_users_date(user['birthday']).strftime("%d.%m.%Y")}
+           for user in normalized_users if user['birthday'] <= delta_today_period]
+
+
+
 
 
 def command_parser(input_str: str):
@@ -82,10 +133,12 @@ class Record:
         self.name = Name(name)
         self.phones = []
         self.birthday = None
-
+        
+    @errors_handler
     def add_birthday(self, value):
         self.birthday = Birthday(value)
-        
+    
+    @errors_handler    
     def show_birthday(self):
         if not self.birthday:
             return print(f'Error')
@@ -133,6 +186,15 @@ class AddressBook(UserDict):
     Args:
         UserDict (dict): OptimizedDict from collections for holding data inside class
     """
+    @errors_handler
+    def birthdays(self):
+        data = list(self.data.values())
+        upcoming_birthdays = get_upcoming_birthdays(data)
+        if len(upcoming_birthdays):
+            print("Users with upcoming birthdays")
+            print(upcoming_birthdays)
+        else:
+            print("No users with upcoming birthdays")
 
     def add_record(self, record):
         self.data[record.name] = record

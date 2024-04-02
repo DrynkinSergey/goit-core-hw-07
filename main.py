@@ -1,11 +1,25 @@
-from api import Record, AddressBook, greetings, help_api, command_parser
+from api import (
+    Record,
+    AddressBook,
+    get_upcoming_birthdays,
+    greetings,
+    help_api,
+    command_parser,
+    normalize_users_date,
+)
 
 
 def main():
     book = AddressBook()
     exit_commands = ["q", "quit", "exit", "leave", "left"]
     print('Welcome to assistant bot! You can use "help" command to see more')
+    new_contact = Record("ivan")
+    new_contact.add_phone("123123123")
+    new_contact.add_phone("123123123")
+    new_contact.add_birthday("10.04.2024")
+    book.add_record(new_contact)
     while True:
+
         params = input(">>>  ")
         # if str is empty - start new loop
         if not params:
@@ -36,6 +50,10 @@ def main():
             case "find" | "get":
                 exist = book.find_record(name)
                 print(exist)
+
+            case "birthdays" | "b":
+                book.birthdays()
+
             case "show_birthday":
                 if len(args) < 1:
                     print(f'Please enter, correct args. Example: "show_birthday Oleh"')
@@ -45,7 +63,7 @@ def main():
                     exist_record.show_birthday()
                 else:
                     print("User is not exist")
-                    continue
+
             case "add_birthday":
                 if len(args) < 2:
                     print(
@@ -57,7 +75,6 @@ def main():
                     exist_record.add_birthday(args[1])
                 else:
                     print("User is not exist")
-                    continue
 
             case "update":
                 if len(args) < 3:
